@@ -1,45 +1,54 @@
-let lines = [];
-let currentLine = 0;
-let currentIndex = 0;
+// 初始化文本框
+function initTextBox() {
+  const textBox = document.createElement("div");
+  textBox.id = "floatingTextBox";
+  textBox.style.position = "fixed";
+  textBox.style.bottom = "0px";
+  textBox.style.left = "0px";
+  textBox.style.background = "rgba(0, 0, 0, 0.7)";
+  textBox.style.color = "white";
+  textBox.style.padding = "5px";
+  textBox.style.fontSize = "12px";
+  textBox.style.fontFamily = "Arial, sans-serif";
+  textBox.style.zIndex = "1000";
+  textBox.style.borderRadius = "0px";  // 如果你不要圆角
+  textBox.style.maxWidth = "200%";
+  textBox.style.overflow = "hidden";
+  textBox.style.whiteSpace = "pre-wrap"; // 支持换行显示
+  document.body.appendChild(textBox);
+  console.log("文本框已添加到页面");
+  return textBox;
+}
 
-// 接收文本内容并初始化
+// 更新文本框内容
+function updateTextBoxContent(text) {
+  const textBox = document.getElementById("floatingTextBox");
+  if (!textBox) {
+    console.error("文本框未找到！");
+    return;
+  }
+  textBox.textContent = text;
+  console.log("文本框内容已更新为：", text);
+}
+
+// 接收恢复状态消息
 chrome.runtime.onMessage.addListener((message) => {
-  if (message.action === "start") {
-    lines = message.text.split("\n");
-    updateTitle();
+  if (message.action === "restoreState") {
+    console.log("收到恢复状态的消息：", message);
+    const { lines, currentIndex } = message;
+    const textBox = document.getElementById("floatingTextBox") || initTextBox();
+    const textToDisplay = lines[currentIndex] || "";
+    updateTextBoxContent(textToDisplay);
   }
 });
 
-
-
-// 更新标签标题
-function updateTitle() {
-  const text = lines[currentLine] || "";
-  document.title = text.slice(currentIndex, currentIndex + 10);
-}
-
-// 热键操作
-document.addEventListener("keydown", (e) => {
-  console.log("键盘事件触发：", e);  // 查看是否捕获到键盘事件
-  if (e.ctrlKey) {
-    switch (e.key) {
-      case "ArrowRight":
-        currentIndex = Math.min(currentIndex + 1, lines[currentLine].length - 10);
-        break;
-      case "ArrowLeft":
-        currentIndex = Math.max(currentIndex - 1, 0);
-        break;
-      case "ArrowDown":
-        currentLine = Math.min(currentLine + 1, lines.length - 1);
-        currentIndex = 0;
-        break;
-      case "ArrowUp":
-        currentLine = Math.max(currentLine - 1, 0);
-        currentIndex = 0;
-        break;
-      default:
-        return;
-    }
-    updateTitle();
-  }
+// 注入 content.js
+chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  const tabId = tabs[0].id; // 获取当前活动标签页的ID
+  chrome.scripting.executeScript({
+    target: { tabId },
+    files: ["content.js"]
+  }, () => {
+    console.log("已重新注入 content.js");
+  });
 });
