@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Title Scroller",
+  "version": "1.0",
+  "description": "动态滚动标签标题并使用热键更新文本。",
+  "permissions": [
+    "storage", 
+    "tabs",
+    "activeTab",
+    "scripting",
+    "commands"
+  ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "commands": {
+    "next-char": {
+      "suggested_key": {
+        "default": "Ctrl+Right"
+      },
+      "description": "切换到下一个字符"
+    },
+    "prev-char": {
+      "suggested_key": {
+        "default": "Ctrl+Left"
+      },
+      "description": "切换到上一个字符"
+    },
+    "next-line": {
+      "suggested_key": {
+        "default": "Ctrl+Down"
+      },
+      "description": "切换到下一行"
+    },
+    "prev-line": {
+      "suggested_key": {
+        "default": "Ctrl+Up"
+      },
+      "description": "切换到上一行"
+    }
+  }
+}
